@@ -1,5 +1,8 @@
 #lang racket
 
+(require "TDAPiece_21475657_TorresOrtiz.rkt")
+
+
 
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de constructor
@@ -19,21 +22,22 @@
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de selectores
 
-;Descripcion: Funcion que obtiene la primera posicion de una lista
-;Dominio: lista
-;Recorrido: primer elemento
+;Descripcion: Funcion que obtiene la primera lista de la board
+;Dominio: board
+;Recorrido: primera lista
 ;Tipo recursión: No aplica
 
 (define (my-car-board board)
   (car board))
 
-;Descripcion: Funcion que obtiene la cola del elemento
-;Dominio: lista
-;Recorrido: lista
+;Descripcion: Funcion que obtiene la cola de la board
+;Dominio: board
+;Recorrido: la cola de la board
 ;Tipo recursión: No aplica
 
 (define (my-cdr-board board)
   (cdr board))
+
 
 
 ;----------------------------------------------------------------------------------------------------------------
@@ -53,6 +57,37 @@
            (valid-position-in-the-rows? (my-cdr-board board))))) ;se llama recursivamente a la funcion con el resto de las filas.
   (valid-position-in-the-rows? board))
 
+
+
+;----------------------------------------------------------------------------------------------------------------
+;Bloque de modificadores
+
+;Descripcion: Funcion que permite jugar una ficha en el tablero
+;Dominio: board (board) X column (int) X piece (piece)
+;Recorrido: board
+;Tipo recursión:
+
+(define(board-set-play-piece board column piece)
+  (if (integer? column)
+      (if (and (< column 6) (>= column 0))
+          (if (equal? (get-color piece) "red")
+              (if (null? (get-column board column))
+                  (error "La columna esta llena")
+                  (if (valid-position? (reverse(get-column board column)))
+                      #t
+                      (error "La columna esta llena")))
+              (if(equal? (get-color piece) "yellow")
+                 (if (null? (get-column board column))
+                     (error "La columna esta llena")
+                     (if (valid-position? (reverse(get-column board column)))
+                         #t
+                         (error "La columna esta llena")))
+                 (error "Solo puede usar los colores yellow o red")))
+      (error "Se ingreso un numero fuera del rango"))
+  (error "Debe ingresar un caracter numerico")))
+
+
+
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de funciones creadas por mi
 
@@ -69,4 +104,15 @@
           (valid-position? (my-cdr-board row))))) ;se llama recursivamente a la funcion para que verifique el resto de la fila.
 
 
+;Descripción: Obtiene una columna de la board
+;Dom: board (board)
+;Rec: list (column)
+;Tipo recursión: natural
 
+(define(get-column board column)
+  (if (>= column 7)
+      '()
+   (if (null? board)
+       '()
+       (cons (list-ref (my-car-board board) column)
+            (get-column (my-cdr-board board) column)))))

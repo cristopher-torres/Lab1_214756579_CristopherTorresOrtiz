@@ -1,5 +1,7 @@
 #lang racket
 
+(provide (all-defined-out))
+
 
 ;Descripción: Función que permite crear una ficha
 ;Dom: color (string)
@@ -9,7 +11,16 @@
 
 (define (piece color)
   (if (string? color) ;Verificamos que ingrese un string
-      (if(or (equal? color "red") (equal? color "yellow"))
-         (list  color)
-         (error "Solo puede ingresar como color red o yellow"))
+      (list  color)
       (error "Ingrese un string")))
+
+;----------------------------------------------------------------------------------------------------------------
+;Bloque de selectores
+
+;Descripcion: Funcion que obtiene el color de la ficha
+;Dominio: lista
+;Recorrido: color
+;Tipo recursión: No aplica
+
+(define (get-color piece)
+  (car piece))
