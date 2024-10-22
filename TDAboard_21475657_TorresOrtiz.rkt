@@ -69,7 +69,7 @@
 
 (define(board-set-play-piece board column piece)
   (if (integer? column)
-      (if (and (< column 6) (>= column 0))
+      (if (and (< column 7) (>= column 0))
           (if (equal? (get-color piece) "red")
               (if (null? (get-column board column))
                   (error "La columna esta llena")
