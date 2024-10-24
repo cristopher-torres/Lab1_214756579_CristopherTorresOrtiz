@@ -54,6 +54,62 @@
 (define (my-cdr-row row)
   (cdr row))
 
+;Descripcion: Funcion que obtiene la primera posicion de la columna
+;Dominio: lista
+;Recorrido: primer elemento
+;Tipo recursión: No aplica
+
+(define (get-firts-column column)
+  (car column))
+
+;Descripcion: Funcion que obtiene la cola de la columna
+;Dominio: lista
+;Recorrido: lista
+;Tipo recursión: No aplica
+
+(define(get-tail-column column)
+  (cdr column))
+
+;Descripcion: Funcion que obtiene el primer elemento de la lista winners
+;Dominio: list
+;Recorrido: primer elemento
+;Tipo recursión: No aplica
+
+(define (my-car-winner winners)
+  (car winners))
+
+;Descripcion: Funcion que obtiene la cola de la lista winners
+;Dominio: list
+;Recorrido: list
+;Tipo recursión: No aplica
+
+(define (my-cdr-winner winners)
+  (cdr winners))
+
+;Descripcion: Obtiene un 0 el cual indica que no hay ganador
+;Dominio: winners (list)
+;Recorrido: 0
+;Selector
+
+(define (get-not-winner winners)
+  (my-car-winner winners))
+
+;Descripcion: Obtiene el numero 1
+;Dominio: winners (list)
+;Recorrido: 1
+;Selector
+
+(define (get-winner-1 winners)
+  (my-car-winner (my-cdr-winner winners)))
+
+;Descripcion: Obtiene el numero 2
+;Dominio: winners(list)
+;Recorrido: 2
+;Selector
+
+(define (get-winner-2 winners)
+  (third winners))
+
 
 
 ;----------------------------------------------------------------------------------------------------------------
@@ -72,6 +128,34 @@
            #t
            (valid-position-in-the-rows? (my-cdr-board board))))) ;se llama recursivamente a la funcion con el resto de las filas.
   (valid-position-in-the-rows? board))
+
+
+;Descripcion: Funcion que verifica si hay un ganador vertical, es decir, que hayan 4 fichas seguidas de un mismo color en una columna.
+;Dominio: board (board) 
+;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador vertical)
+;Tipo recursión: de cola
+
+(define winners (list 0 1 2))
+
+
+(define (board-check-vertical-win board)
+   (define (check-column num-column column acc)
+     (if (= num-column 7)
+         (get-not-winner winners)
+         (if (null? column)
+             (check-column (+ num-column 1) (get-column board (+ num-column 1)) 1)
+             (if (= acc 4)
+                 (if(equal? (get-firts-column column) 'R)
+                    (get-winner-1 winners)
+                    (get-winner-2 winners))
+                 (if (null? (get-tail-column column))
+                     (check-column (+ num-column 1) (get-column board (+ num-column 1)) 1)
+                     (if (or (equal? (get-firts-column column) 'R ) (equal? (get-firts-column column) 'Y ))
+                         (if (equal? (get-firts-column column) (get-firts-column(get-tail-column column)))
+                             (check-column num-column (get-tail-column column) (+ acc 1))
+                             (check-column num-column (get-tail-column column) 1))
+                         (check-column num-column (get-tail-column column) 1)))))))
+  (check-column 0 (get-column board 0) 1))
 
 
 
