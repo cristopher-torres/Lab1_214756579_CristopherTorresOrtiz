@@ -158,6 +158,33 @@
   (check-column 0 (get-column board 0) 1))
 
 
+;Descripcion: Funcion que verifica si hay un ganador horizontal, es decir, que hayan 4 fichas seguidas de un mismo color en una fila.
+;Dominio: board (board) 
+;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador horizontal)
+;Tipo recursión: natural
+
+
+(define (board-check-horizontal-win board)
+   (define (check-row num-row row acc)
+     (if (= num-row 6)
+         (get-not-winner winners)
+         (if (null? row)
+             (check-row (+ num-row 1) (get-row board (+ num-row 1)) 1)
+             (if (= acc 4)
+                 (if(equal? (my-car-row row) 'R)
+                    (get-winner-1 winners)
+                    (get-winner-2 winners))
+                 (if (null? (my-cdr-row row))
+                     (check-row (+ num-row 1) (get-row board (+ num-row 1)) 1)
+                     (if (or (equal? (my-car-row row) 'R ) (equal? (my-car-row row) 'Y ))
+                         (if (equal? (my-car-row row) (my-car-row(my-cdr-row row)))
+                             (check-row num-row (my-cdr-row row) (+ acc 1))
+                             (check-row num-row (my-cdr-row row) 1))
+                         (check-row num-row (my-cdr-row row) 1)))))))
+  (check-row 0 (get-row board 0) 1))
+
+
+
 
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de modificadores
@@ -261,5 +288,17 @@
     ((null? row) '())
     ((= index pos) (cons piece (my-cdr-row row)))
     (else (cons (my-car-row row) (put-piece (my-cdr-row row) pos (+ index 1) piece)))))
+
+;Descripción: Obtiene una fila de la board
+;Dom: board (board)
+;Rec: list (row)
+;Tipo recursión: no aplica
+
+(define(get-row board row)
+  (if (>= row 6)
+      '()
+      (if (null? board)
+          '()
+          (list-ref board row))))
 
 
