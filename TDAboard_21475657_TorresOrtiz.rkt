@@ -301,4 +301,46 @@
           '()
           (list-ref board row))))
 
+;Descripción: Obtiene la columna descendente de un elemento
+;Dom: board (board), row (int), column (int)
+;Rec: diagonal (list)
+;Tipo recursión: natural
+
+
+(define (get-diagonal-desc board row column)
+  (if (or (>= row 6) (>= column 7)) 
+      '()
+      (cons (list-ref (list-ref board row) column)
+            (get-diagonal-desc board (+ row 1) (+ column 1)))))
+
+;Descripción: funcion auxiliar que se usara en verificar la victoria diagonal, la cual revisa si hay cuatro fichas seguidas iguales en una diagonal
+;Dom: diagonal (list), acc (int)
+;Rec: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador vertical)
+;Tipo recursión: de cola
+
+(define (get-victory-player diagonal acc)
+  (if (null? (my-cdr-row diagonal))
+      (get-not-winner winners) 
+      (if (= acc 4)
+          (if (equal? (my-car-row diagonal) 'R)
+              (get-winner-1 winners) 
+              (if (equal? (my-car-row diagonal) 'Y)
+                  (get-winner-2 winners)
+                  (get-not-winner winners)))
+          (if (not(equal? (my-car-row diagonal) (my-car-row (my-cdr-row diagonal))))
+              (get-victory-player (my-cdr-row diagonal)  1) 
+              (get-victory-player (my-cdr-row diagonal)  (+ acc 1))))))
+      
+
+;Descripción: Obtiene la columna ascendente de un elemento
+;Dom: board (board), row (int), column (int)
+;Rec: diagonal (list)
+;Tipo recursión: natural
+
+
+(define (get-diagonal-asc board row column)
+  (if (or (< row 0) (>= column 7)) 
+      '()
+      (cons (list-ref(list-ref board row) column)
+            (get-diagonal-asc board (- row 1) (+ column 1)))))
 
