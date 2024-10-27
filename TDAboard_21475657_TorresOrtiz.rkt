@@ -202,6 +202,20 @@
   (check-diagonal 0 0))
 
 
+;Descripcion: Funcion que verifica si hay un ganador, el cual puede ser vertical, horizontal o diagonal
+;Dominio: board (board) 
+;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador)
+;Tipo recursión: no aplica
+;declarativa
+
+(define(board-who-is-winner board)
+  (if(or (= (board-check-diagonal-win board) 1) (= (board-check-vertical-win board) 1) (= (board-check-horizontal-win board) 1) )
+     (get-winner-1 winners)
+     (if (or (= (board-check-diagonal-win board) 2) (= (board-check-vertical-win board) 2) (= (board-check-horizontal-win board) 2)  )
+         (get-winner-2 winners)
+         (get-not-winner winners))))
+
+
 
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de modificadores
