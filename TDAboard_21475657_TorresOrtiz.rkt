@@ -183,6 +183,23 @@
                          (check-row num-row (my-cdr-row row) 1)))))))
   (check-row 0 (get-row board 0) 1))
 
+;Descripcion: Funcion que verifica si hay un ganador diagonal, es decir, que hayan 4 fichas seguidas de un mismo color en una diagonal.
+;Dominio: board (board) 
+;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador diagonal)
+;Tipo recursión: de cola
+
+(define(board-check-diagonal-win board)
+  (define (check-diagonal row index)
+    (if(= row 6)
+       (get-not-winner winners)
+       (if (= index 7)
+           (check-diagonal (+ row 1) 0)
+           (if (or (= (get-victory-player (get-diagonal-asc board row index) 1) 1) (= (get-victory-player (get-diagonal-desc board row index ) 1) 1))
+               (get-winner-1 winners)
+               (if(or (= (get-victory-player (get-diagonal-asc board row index) 1) 2) (= (get-victory-player (get-diagonal-desc board row index) 1) 2) )
+                  (get-winner-2 winners)
+                  (check-diagonal row (+ index 1)))))))
+  (check-diagonal 0 0))
 
 
 
