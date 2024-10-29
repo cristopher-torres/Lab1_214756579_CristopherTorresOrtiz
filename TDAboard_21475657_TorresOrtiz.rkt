@@ -1,6 +1,7 @@
 #lang racket
 
 (require "TDAPiece_21475657_TorresOrtiz.rkt")
+(provide (all-defined-out))
 
 
 
@@ -23,52 +24,21 @@
 ;Bloque de selectores
 
 ;Descripcion: Funcion que obtiene la primera lista de la board
-;Dominio: board
-;Recorrido: primera lista
+;Dominio: lista de listas
+;Recorrido: lista
 ;Tipo recursión: No aplica
 
 (define (my-car-board board)
   (car board))
 
 ;Descripcion: Funcion que obtiene la cola de la board
-;Dominio: board
-;Recorrido: la cola de la board
+;Dominio: lista de listas
+;Recorrido: listas
 ;Tipo recursión: No aplica
 
 (define (my-cdr-board board)
   (cdr board))
 
-;Descripcion: Funcion que obtiene el primer elemento de una fila
-;Dominio: row
-;Recorrido: primer elemento
-;Tipo recursión: No aplica
-
-(define (my-car-row row)
-  (car row))
-
-;Descripcion: Funcion que obtiene la cola de la fila
-;Dominio: row
-;Recorrido: la cola de la fila
-;Tipo recursión: No aplica
-
-(define (my-cdr-row row)
-  (cdr row))
-
-;Descripcion: Funcion que obtiene la primera posicion de la columna
-;Dominio: lista
-;Recorrido: primer elemento
-;Tipo recursión: No aplica
-
-(define (get-firts-column column)
-  (car column))
-
-;Descripcion: Funcion que obtiene la cola de la columna
-;Dominio: lista
-;Recorrido: lista
-;Tipo recursión: No aplica
-
-(define(get-tail-column column)
-  (cdr column))
 
 ;Descripcion: Funcion que obtiene el primer elemento de la lista winners
 ;Dominio: list
@@ -106,10 +76,65 @@
 ;Dominio: winners(list)
 ;Recorrido: 2
 ;Selector
-
 (define (get-winner-2 winners)
   (third winners))
 
+
+;Descripcion: Funcion que obtiene la primera posicion de la columna
+;Dominio: lista
+;Recorrido: primer elemento
+;Tipo recursión: No aplica
+
+(define (get-firts-column column)
+  (car column))
+
+;Descripcion: Funcion que obtiene la cola de la columna
+;Dominio: lista
+;Recorrido: lista
+;Tipo recursión: No aplica
+
+(define(get-tail-column column)
+  (cdr column))
+
+;Descripcion: Funcion que obtiene el primer elemento de una fila
+;Dominio: row
+;Recorrido: primer elemento
+;Tipo recursión: No aplica
+
+(define (my-car-row row)
+  (car row))
+
+;Descripcion: Funcion que obtiene la cola de la fila
+;Dominio: row
+;Recorrido: la cola de la fila
+;Tipo recursión: No aplica
+
+(define (my-cdr-row row)
+  (cdr row))
+
+;Descripcion: Obtiene el segundo elemento de una lista
+;Dominio: lista (list)
+;Recorrido: segundo elemento
+;Selector
+
+(define (get-second-element list)
+  (car(cdr list)))
+
+;Descripcion: Obtiene el tercer elemento de una lista
+;Dominio: lista (list)
+;Recorrido: tercer elemento
+;Selector
+
+(define (get-three-element list)
+  (third list))
+
+;Descripcion: Obtiene el cuarto elemento de una lista
+;Dominio: lista (list)
+;Recorrido: cuarto elemento
+;Selector
+
+(define (get-four-element list)
+  (fourth list))
 
 
 ;----------------------------------------------------------------------------------------------------------------
@@ -133,30 +158,23 @@
 ;Descripcion: Funcion que verifica si hay un ganador vertical, es decir, que hayan 4 fichas seguidas de un mismo color en una columna.
 ;Dominio: board (board) 
 ;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador vertical)
-;Tipo recursión: de cola
+;Tipo recursión: natural
 
 (define winners (list 0 1 2))
 
 
 (define (board-check-vertical-win board)
-   (define (check-column num-column column acc)
+   (define (check-column num-column)
      (if (= num-column 7)
          (get-not-winner winners)
-         (if (null? column)
-             (check-column (+ num-column 1) (get-column board (+ num-column 1)) 1)
-             (if (= acc 4)
-                 (if(equal? (get-firts-column column) 'R)
-                    (get-winner-1 winners)
-                    (get-winner-2 winners))
-                 (if (null? (get-tail-column column))
-                     (check-column (+ num-column 1) (get-column board (+ num-column 1)) 1)
-                     (if (or (equal? (get-firts-column column) 'R ) (equal? (get-firts-column column) 'Y ))
-                         (if (equal? (get-firts-column column) (get-firts-column(get-tail-column column)))
-                             (check-column num-column (get-tail-column column) (+ acc 1))
-                             (check-column num-column (get-tail-column column) 1))
-                         (check-column num-column (get-tail-column column) 1)))))))
-  (check-column 0 (get-column board 0) 1))
+         (if (equal? (win-column? (get-column board num-column)) 1)
+               (get-winner-1 winners)
+               (if (equal? (win-column? (get-column board num-column)) 2)
+                   (get-winner-2 winners)
+                   (check-column (+ num-column 1))))))
+  (check-column 0))
 
+      
 
 ;Descripcion: Funcion que verifica si hay un ganador horizontal, es decir, que hayan 4 fichas seguidas de un mismo color en una fila.
 ;Dominio: board (board) 
@@ -165,23 +183,13 @@
 
 
 (define (board-check-horizontal-win board)
-   (define (check-row num-row row acc)
-     (if (= num-row 6)
-         (get-not-winner winners)
-         (if (null? row)
-             (check-row (+ num-row 1) (get-row board (+ num-row 1)) 1)
-             (if (= acc 4)
-                 (if(equal? (my-car-row row) 'R)
-                    (get-winner-1 winners)
-                    (get-winner-2 winners))
-                 (if (null? (my-cdr-row row))
-                     (check-row (+ num-row 1) (get-row board (+ num-row 1)) 1)
-                     (if (or (equal? (my-car-row row) 'R ) (equal? (my-car-row row) 'Y ))
-                         (if (equal? (my-car-row row) (my-car-row(my-cdr-row row)))
-                             (check-row num-row (my-cdr-row row) (+ acc 1))
-                             (check-row num-row (my-cdr-row row) 1))
-                         (check-row num-row (my-cdr-row row) 1)))))))
-  (check-row 0 (get-row board 0) 1))
+   (if (null? board)
+       (get-not-winner winners)
+       (if (equal? (win-row? (my-car-board board)) 1)
+               (get-winner-1 winners)
+               (if (equal? (win-row? (my-car-board  board)) 2)
+                   (get-winner-2 winners)
+                   (board-check-horizontal-win (my-cdr-board board))))))
 
 ;Descripcion: Funcion que verifica si hay un ganador diagonal, es decir, que hayan 4 fichas seguidas de un mismo color en una diagonal.
 ;Dominio: board (board) 
@@ -201,7 +209,6 @@
                   (check-diagonal row (+ index 1)))))))
   (check-diagonal 0 0))
 
-
 ;Descripcion: Funcion que verifica si hay un ganador, el cual puede ser vertical, horizontal o diagonal
 ;Dominio: board (board) 
 ;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador)
@@ -217,6 +224,7 @@
 
 
 
+
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de modificadores
 
@@ -224,11 +232,10 @@
 ;Dominio: board (board) X column (int) X piece (piece)
 ;Recorrido: board
 ;Tipo recursión: no aplica
-;declarativa
 
 (define(board-set-play-piece board column piece)
   (if (integer? column)
-      (if (and (< column 7) (>= column 0))
+      (if (and (<= column 6) (>= column 0))
           (if (equal? (get-color piece) "red")
               (if (null? (get-column board column))
                   (error "La columna esta llena")
@@ -248,7 +255,7 @@
 
 
 ;----------------------------------------------------------------------------------------------------------------
-;Bloque de funciones creadas por mi
+;Bloque de funciones auxiliares
 
 ;Descripción: recorre una lista (fila en el contexto del proyecto) y verifica si hay 0 dentro de esa lista.
 ;Dom: board (board)
@@ -263,18 +270,18 @@
           (valid-position? (my-cdr-board row))))) ;se llama recursivamente a la funcion para que verifique el resto de la fila.
 
 
-;Descripción: Obtiene una columna de la board
-;Dom: board (board)
-;Rec: list (column)
-;Tipo recursión: natural
+;Descripción: Pone una ficha en una fila en la posicion de la columna que se indique,es decir, si la columna es 3 y la fila una list (0 0 0 0 0) el resultado sera (0 0 0 ficha 0).
+            ; Donde row es una fila, pos es la columna donde se quiere poner la ficha, index es un acumulador para saber donde se pone la ficha, y piece es la ficha que se pondra.
+;Dom: row (list), pos (int), index (int), piece(simbolo)
+;Rec: board (board)
+;Tipo recursión: de cola
 
-(define(get-column board column)
-  (if (>= column 7)
-      '()
-   (if (null? board)
-       '()
-       (cons (list-ref (my-car-board board) column)
-            (get-column (my-cdr-board board) column)))))
+
+(define (put-piece row pos index piece)
+  (cond
+    ((null? row) '())
+    ((= index pos) (cons piece (my-cdr-row row)))
+    (else (cons (my-car-row row) (put-piece (my-cdr-row row) pos (+ index 1) piece)))))
 
 ;Descripción: Crea un nuevo tablero con una R en la columna que diga el usuario
 ;Dom: board (board), column (lista)
@@ -307,30 +314,51 @@
            (cons (put-piece (my-car-board board) column 0 'Y) (my-cdr-board board))))))
 
 
-;Descripción: Pone una ficha en una fila en la posicion de la columna que se indique,es decir, si la columna es 3 y la fila una list (0 0 0 0 0) el resultado sera (0 0 0 ficha 0).
-            ; Donde row es una fila, pos es la columna donde se quiere poner la ficha, index es un acumulador para saber donde se pone la ficha, y piece es la ficha que se pondra.
-;Dom: row (list), pos (int), index (int), piece(simbolo)
-;Rec: board (board)
+;Descripción: Obtiene una columna de la board
+;Dom: board (board)
+;Rec: list (column)
+;Tipo recursión: natural
+
+(define(get-column board column)
+  (if (>= column 7)
+      '()
+   (if (null? board)
+       '()
+       (cons (list-ref (my-car-board board) column)
+            (get-column (my-cdr-board board) column)))))
+
+;Descripción: funcion auxiliar que se usara en verificar la victoria vertical, la cual revisa si hay cuatro fichas seguidas iguales en una columna
+;Dom: column(list)
+;Rec: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador vertical)
 ;Tipo recursión: de cola
 
+(define (win-column? column)
+  (if (< (length column) 4)
+      (get-not-winner winners)
+      (if (and (equal? (get-firts-column column) (get-second-element column)) (equal? (get-second-element column) (get-three-element column)) (equal? (get-three-element column) (get-four-element column)))
+          (if (equal? (get-firts-column column) 'R)
+              (get-winner-1 winners) 
+              (if (equal? (get-firts-column column) 'Y)
+                  (get-winner-2 winners)
+                  (get-not-winner winners)))
+          (win-column? (get-tail-column column)))))
+                   
 
-(define (put-piece row pos index piece)
-  (cond
-    ((null? row) '())
-    ((= index pos) (cons piece (my-cdr-row row)))
-    (else (cons (my-car-row row) (put-piece (my-cdr-row row) pos (+ index 1) piece)))))
+;Descripción: funcion auxiliar que se usara en verificar la victoria horizontal, la cual revisa si hay cuatro fichas seguidas iguales en una fila
+;Dom: row (list)
+;Rec: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador horizontal)
+;Tipo recursión: de cola
 
-;Descripción: Obtiene una fila de la board
-;Dom: board (board)
-;Rec: list (row)
-;Tipo recursión: no aplica
-
-(define(get-row board row)
-  (if (>= row 6)
-      '()
-      (if (null? board)
-          '()
-          (list-ref board row))))
+(define (win-row? row)
+  (if (< (length row) 4)  
+      (get-not-winner winners)     
+      (if (and (equal? (my-car-row row) (get-second-element row)) (equal? (get-second-element row) (get-three-element row)) (equal? (get-three-element row) (get-four-element row)))  
+          (if (equal? (my-car-row row) 'R)     
+              (get-winner-1 winners)     
+              (if (equal? (my-car-row row) 'Y)  
+                  (get-winner-2 winners)
+                  (get-not-winner winners)))
+          (win-row? (my-cdr-row row)))))
 
 ;Descripción: Obtiene la columna descendente de un elemento
 ;Dom: board (board), row (int), column (int)
@@ -344,9 +372,21 @@
       (cons (list-ref (list-ref board row) column)
             (get-diagonal-desc board (+ row 1) (+ column 1)))))
 
+;Descripción: Obtiene la columna ascendente de un elemento
+;Dom: board (board), row (int), column (int)
+;Rec: diagonal (list)
+;Tipo recursión: natural
+
+
+(define (get-diagonal-asc board row column)
+  (if (or (< row 0) (>= column 7)) 
+      '()
+      (cons (list-ref(list-ref board row) column)
+            (get-diagonal-asc board (- row 1) (+ column 1)))))
+
 ;Descripción: funcion auxiliar que se usara en verificar la victoria diagonal, la cual revisa si hay cuatro fichas seguidas iguales en una diagonal
 ;Dom: diagonal (list), acc (int)
-;Rec: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador vertical)
+;Rec: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador diagonal)
 ;Tipo recursión: de cola
 
 (define (get-victory-player diagonal acc)
@@ -361,17 +401,11 @@
           (if (not(equal? (my-car-row diagonal) (my-car-row (my-cdr-row diagonal))))
               (get-victory-player (my-cdr-row diagonal)  1) 
               (get-victory-player (my-cdr-row diagonal)  (+ acc 1))))))
-      
-
-;Descripción: Obtiene la columna ascendente de un elemento
-;Dom: board (board), row (int), column (int)
-;Rec: diagonal (list)
-;Tipo recursión: natural
+     
 
 
-(define (get-diagonal-asc board row column)
-  (if (or (< row 0) (>= column 7)) 
-      '()
-      (cons (list-ref(list-ref board row) column)
-            (get-diagonal-asc board (- row 1) (+ column 1)))))
+
+
+
+
 
