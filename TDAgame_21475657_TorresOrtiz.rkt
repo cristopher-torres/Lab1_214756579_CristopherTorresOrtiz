@@ -65,8 +65,8 @@
 ;Tipo recursión: No aplica
 ;Selector
 
-(define (get-board-game game)
-  (third game))
+(define (game-get-board game)
+  (my-car-game(my-cdr-game(my-cdr-game game))))
 
 ;Descripcion: Obtiene la el current turn del game
 ;Dominio: game (game)
@@ -99,8 +99,8 @@
 
 
 (define(game-is-draw? game)
-  (if (equal? (board-can-play? (get-board-game game)) #f)
+  (if (equal? (board-can-play? (game-get-board game)) #f)
       #t
-      (if (and (= (get-remaining-pieces-player(get-player1 game)) 0) (= (get-remaining-pieces-player(get-player2 game)) 0) (= (board-who-is-winner(get-board-game game)) 0))
+      (if (and (= (get-remaining-pieces-player(get-player1 game)) 0) (= (get-remaining-pieces-player(get-player2 game)) 0) (= (board-who-is-winner(game-get-board game)) 0))
           #t
           #f)))
