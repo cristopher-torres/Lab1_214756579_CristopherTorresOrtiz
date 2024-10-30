@@ -20,3 +20,77 @@
       (error "El current-turn debe ser mayor que 0")))
 
 
+;----------------------------------------------------------------------------------------------------------------
+;Bloque de selectores
+
+;Descripcion: Funcion que obtiene el primer elemento de la lista game
+;Dominio: list
+;Recorrido: primer elemento
+;Tipo recursión: No aplica
+;Selector
+
+(define (my-car-game game)
+  (car game))
+
+;Descripcion: Funcion que obtiene la cola de la lista game
+;Dominio: list
+;Recorrido: list
+;Tipo recursión: No aplica
+;Selector
+
+(define (my-cdr-game game)
+  (cdr game))
+
+;Descripcion: Función que optiene el player 1 de la lista game
+;Dominio: game (game)
+;Recorrido: player 1 (list)
+;Tipo recursión: No aplica
+;Selector
+
+(define(get-player1 game)
+  (my-car-game game))
+
+;Descripcion: Función que optiene el player 2 de la lista game
+;Dominio: game (game)
+;Recorrido: player 2 (list)
+;Tipo recursión: No aplica
+;Selector
+
+(define(get-player2 game)
+  (my-car-game(my-cdr-game game)))
+
+;Descripcion: Obtiene la board del game
+;Dominio: game (game)
+;Recorrido: board (list)
+;Tipo recursión: No aplica
+;Selector
+
+(define (get-board-game game)
+  (third game))
+
+;Descripcion: Obtiene la el current turn del game
+;Dominio: game (game)
+;Recorrido: current-turn (int)
+;Tipo recursión: No aplica
+;Selector
+
+(define (get-current-turn-game game)
+  (fourth game))
+
+
+;----------------------------------------------------------------------------------------------------------------
+;Bloque de otras funciones
+
+;Descripcion: Función que verifica si el estado actual del juego es empate.
+;Dominio: game (game)
+;Recorrido: game
+;Tipo recursión: no aplica
+
+
+
+(define(game-is-draw? game)
+  (if (equal? (board-can-play? (get-board-game game)) #f)
+      #t
+      (if (and (= (get-remaining-pieces-player(get-player1 game)) 0) (= (get-remaining-pieces-player(get-player2 game)) 0) (= (board-who-is-winner(get-board-game game)) 0))
+          #t
+          #f)))
