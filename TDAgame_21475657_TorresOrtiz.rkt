@@ -77,6 +77,16 @@
 (define (get-current-turn-game game)
   (fourth game))
 
+;Descripcion: Función que obtiene el jugador cuyo turno está en curso.
+;Dominio: game (game)
+;Recorrido: player
+;Tipo recursión: no aplica
+
+(define(game-get-current-player game)
+  (if (= (modulo (get-current-turn-game game) 2) 1) ;se asume que el current turn siempre empezara en 1
+      (get-player1 game) ; se asume que siempre parte el jugador 1
+      (get-player2 game)))
+
 
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de otras funciones
