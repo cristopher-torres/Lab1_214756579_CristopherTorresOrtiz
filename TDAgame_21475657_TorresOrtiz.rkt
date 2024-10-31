@@ -87,12 +87,11 @@
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de otras funciones
 
+
 ;Descripcion: Función que verifica si el estado actual del juego es empate.
 ;Dominio: game (game)
 ;Recorrido: game
 ;Tipo recursión: no aplica
-
-
 
 (define(game-is-draw? game)
   (if (equal? (can-play? (game-get-board game)) #f)
@@ -116,7 +115,7 @@
   (if (= (board-who-is-winner (game-get-board game)) 1)
       (list(player-update-stats (get-player1 game) "win") (player-update-stats (get-player2 game) "loss")(game-get-board game) (get-current-turn-game game))
       (if(= (board-who-is-winner (game-get-board game)) 2)
-         (list(player-update-stats (get-player2 game) "win") (player-update-stats (get-player1 game) "loss")(game-get-board game) (get-current-turn-game game))
+         (list(player-update-stats (get-player1 game) "loss") (player-update-stats (get-player2 game) "win")(game-get-board game) (get-current-turn-game game))
          (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game)))))
 
 
@@ -186,3 +185,4 @@
            #t
            (valid-position-in-the-rows? (my-cdr-board board))))) 
   (valid-position-in-the-rows? board))
+  
