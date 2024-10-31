@@ -104,3 +104,19 @@
       (if (and (= (get-remaining-pieces-player(get-player1 game)) 0) (= (get-remaining-pieces-player(get-player2 game)) 0) (= (board-who-is-winner(game-get-board game)) 0))
           #t
           #f)))
+
+;----------------------------------------------------------------------------------------------------------------
+;Bloque de modificadores
+
+
+;Descripcion: Función finaliza el juego actualizando las estadísticas de los jugadores según el resultado.
+;Dominio: game (game)
+;Recorrido: game
+;Tipo recursión: no aplica
+
+(define(game-set-end game)
+  (if (= (board-who-is-winner (game-get-board game)) 1)
+      (list(player-update-stats (get-player1 game) "win") (player-update-stats (get-player2 game) "loss")(game-get-board game) (get-current-turn-game game))
+      (if(= (board-who-is-winner (game-get-board game)) 2)
+         (list(player-update-stats (get-player2 game) "win") (player-update-stats (get-player1 game) "loss")(game-get-board game) (get-current-turn-game game))
+         (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game)))))
