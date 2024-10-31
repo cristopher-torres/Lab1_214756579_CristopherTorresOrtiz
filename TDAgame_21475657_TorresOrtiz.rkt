@@ -120,3 +120,50 @@
       (if(= (board-who-is-winner (game-get-board game)) 2)
          (list(player-update-stats (get-player2 game) "win") (player-update-stats (get-player1 game) "loss")(game-get-board game) (get-current-turn-game game))
          (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game)))))
+
+;Descripcion: Función que realiza un movimiento.
+;Dominio: game (game) X player (player) X column (int)
+;Recorrido: game
+;Tipo recursión: no aplica
+;declarativa
+
+
+(define (game-player-set-move game player column)
+  (if (or (= (board-who-is-winner (game-get-board game)) 1) (= (board-who-is-winner (game-get-board game)) 2) )
+          (error "Ya hay un ganador, el juego ha finalizado")
+          (if (or (< column 0) (> column 6))
+              (error "Ponga una columna del 0 al 6")
+              (if(< (get-remaining-pieces-player(get-player1 game)) 0)
+                 (error "El jugador 1 no tiene mas fichas")
+                 (if(< (get-remaining-pieces-player(get-player2 game)) 0)
+                    (error "El jugador 2 no tiene mas fichas")
+                    (if(equal? (game-is-draw? (updated-game game player column)) #t)
+                       (game-set-end (updated-game game player column))
+                       (if(equal? (get-id-player player) (get-id-player(game-get-current-player game)))
+                          (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece(get-color-player player))))0)
+                              (updated-game game player column)
+                              (game-set-end (updated-game game player column)))
+                          (error "No es tu turno"))))))))
+         
+
+
+;----------------------------------------------------------------------------------------------------------------
+;Bloque de funciones auxiliares
+
+;Descripcion: Función que permite quitar una ficha a un jugador
+;Dominio: player (list)
+;Recorrido: player(list)
+;Tipo recursión: no aplica
+
+(define (remove-piece player)
+  (list (get-id-player player) (get-name-player player) (get-color-player player) (get-wins-player player)  (get-losses-player player) (get-draws-player player) (-(get-remaining-pieces-player player) 1)))
+
+;Descripcion: Función que permite actualizar las fichas del jugador, actualizar la board del game y sumar uno al current-turn
+;Dominio: player (list) game (game) column (int)
+;Recorrido: game (game)
+;Tipo recursión: no aplica
+
+(define (updated-game game player column)
+  (if(= (get-id-player player) 1)
+     (list  (remove-piece (get-player1 game)) (get-player2 game) (board-set-play-piece (game-get-board game) column (piece(get-color-player player))) (+ (get-current-turn-game game) 1 ))
+     (list (get-player1 game) (remove-piece (get-player2 game)) (board-set-play-piece (game-get-board game) column (piece(get-color-player player))) (+ (get-current-turn-game game) 1 ))))
