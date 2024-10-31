@@ -3,7 +3,7 @@
 (require "TDAPlayer_21475657_TorresOrtiz.rkt")
 (require "TDAboard_21475657_TorresOrtiz.rkt")
 (require "TDAPiece_21475657_TorresOrtiz.rkt")
-
+(provide game game-is-draw? game-get-current-player game-get-board game-set-end game-player-set-move)
 
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de constructor
@@ -27,7 +27,6 @@
 ;Dominio: list
 ;Recorrido: primer elemento
 ;Tipo recursión: No aplica
-;Selector
 
 (define (my-car-game game)
   (car game))
@@ -36,7 +35,6 @@
 ;Dominio: list
 ;Recorrido: list
 ;Tipo recursión: No aplica
-;Selector
 
 (define (my-cdr-game game)
   (cdr game))
@@ -45,7 +43,6 @@
 ;Dominio: game (game)
 ;Recorrido: player 1 (list)
 ;Tipo recursión: No aplica
-;Selector
 
 (define(get-player1 game)
   (my-car-game game))
@@ -54,7 +51,6 @@
 ;Dominio: game (game)
 ;Recorrido: player 2 (list)
 ;Tipo recursión: No aplica
-;Selector
 
 (define(get-player2 game)
   (my-car-game(my-cdr-game game)))
@@ -99,11 +95,13 @@
 
 
 (define(game-is-draw? game)
-  (if (equal? (board-can-play? (game-get-board game)) #f)
+  (if (equal? (can-play? (game-get-board game)) #f)
       #t
       (if (and (= (get-remaining-pieces-player(get-player1 game)) 0) (= (get-remaining-pieces-player(get-player2 game)) 0) (= (board-who-is-winner(game-get-board game)) 0))
           #t
           #f)))
+
+
 
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de modificadores
@@ -120,6 +118,8 @@
       (if(= (board-who-is-winner (game-get-board game)) 2)
          (list(player-update-stats (get-player2 game) "win") (player-update-stats (get-player1 game) "loss")(game-get-board game) (get-current-turn-game game))
          (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game)))))
+
+
 
 ;Descripcion: Función que realiza un movimiento.
 ;Dominio: game (game) X player (player) X column (int)
@@ -140,9 +140,13 @@
                     (if(equal? (game-is-draw? (updated-game game player column)) #t)
                        (game-set-end (updated-game game player column))
                        (if(equal? (get-id-player player) (get-id-player(game-get-current-player game)))
-                          (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece(get-color-player player))))0)
-                              (updated-game game player column)
-                              (game-set-end (updated-game game player column)))
+                          (if (= (get-id-player player) 1)
+                              (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "red"))) 0)
+                                  (updated-game game player column)
+                                  (game-set-end (updated-game game player column)))
+                              (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "yellow"))) 0)
+                                  (updated-game game player column)
+                                  (game-set-end (updated-game game player column))))
                           (error "No es tu turno"))))))))
          
 
@@ -165,5 +169,20 @@
 
 (define (updated-game game player column)
   (if(= (get-id-player player) 1)
-     (list  (remove-piece (get-player1 game)) (get-player2 game) (board-set-play-piece (game-get-board game) column (piece(get-color-player player))) (+ (get-current-turn-game game) 1 ))
-     (list (get-player1 game) (remove-piece (get-player2 game)) (board-set-play-piece (game-get-board game) column (piece(get-color-player player))) (+ (get-current-turn-game game) 1 ))))
+     (list  (remove-piece (get-player1 game)) (get-player2 game) (board-set-play-piece (game-get-board game) column (piece "red")) (+ (get-current-turn-game game) 1 ))
+     (list (get-player1 game) (remove-piece (get-player2 game)) (board-set-play-piece (game-get-board game) column (piece "yellow")) (+ (get-current-turn-game game) 1 ))))
+
+;Descripción: Función que permite verificar si se puede realizar más jugadas en el tablero.
+;esta funcion es igual al board-can-play? sin verificar si hay un ganador, ya que me generaba un mal resultado en game-is-draw?.
+;Dom: board (board)
+;Rec: boolean (#t si se puede jugar, #f si no) 
+;Tipo recursión: Cola
+
+(define (can-play? board)
+  (define(valid-position-in-the-rows? board) 
+    (if (null? board) 
+        #f
+        (if(valid-position? (my-car-board board)) 
+           #t
+           (valid-position-in-the-rows? (my-cdr-board board))))) 
+  (valid-position-in-the-rows? board))

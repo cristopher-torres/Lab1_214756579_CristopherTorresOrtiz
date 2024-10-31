@@ -149,9 +149,11 @@
   (define(valid-position-in-the-rows? board) 
     (if (null? board) ;caso base, si el tablero llega a la posicion null significa que no hay una posicion valida para jugar y devuelve #f.
         #f
-        (if(valid-position? (my-car-board board)) ;se verifica si en la primera fila hay una posicion valida es decir una posicion con un 0, si es el caso devuelve #t.
-           #t
-           (valid-position-in-the-rows? (my-cdr-board board))))) ;se llama recursivamente a la funcion con el resto de las filas.
+        (if (not(= (board-who-is-winner board) 0))
+            #f
+            (if(valid-position? (my-car-board board)) ;se verifica si en la primera fila hay una posicion valida es decir una posicion con un 0, si es el caso devuelve #t.
+               #t
+               (valid-position-in-the-rows? (my-cdr-board board)))))) ;se llama recursivamente a la funcion con el resto de las filas.
   (valid-position-in-the-rows? board))
 
 

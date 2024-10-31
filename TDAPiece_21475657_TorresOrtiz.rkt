@@ -11,7 +11,9 @@
 
 (define (piece color)
   (if (string? color) ;Verificamos que ingrese un string
-      (list  color)
+      (if (or (equal? color "red") (equal? color "yellow")) ;por temas de implementacion se dejara solo ocupar red y yellow
+          (list  color)
+          (error "Debe ingresar red o yellow"))
       (error "Ingrese un string")))
 
 ;----------------------------------------------------------------------------------------------------------------
