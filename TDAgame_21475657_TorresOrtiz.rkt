@@ -3,7 +3,7 @@
 (require "TDAPlayer_21475657_TorresOrtiz.rkt")
 (require "TDAboard_21475657_TorresOrtiz.rkt")
 (require "TDAPiece_21475657_TorresOrtiz.rkt")
-(provide game game-is-draw? game-get-current-player game-get-board game-set-end game-player-set-move)
+(provide game game-history game-is-draw? game-get-current-player game-get-board game-set-end game-player-set-move)
 
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de constructor
@@ -87,6 +87,13 @@
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de otras funciones
 
+;Descripcion: Función que genera un historial de movimientos de la partida.
+;Dominio: game (game)
+;Recorrido: history
+;Tipo recursión: no aplica
+
+(define (game-history game)
+  (moves-columns (game-get-board game) 0))
 
 ;Descripcion: Función que verifica si el estado actual del juego es empate.
 ;Dominio: game (game)
@@ -129,24 +136,26 @@
 
 (define (game-player-set-move game player column)
   (if (or (= (board-who-is-winner (game-get-board game)) 1) (= (board-who-is-winner (game-get-board game)) 2) )
-          (error "Ya hay un ganador, el juego ha finalizado")
-          (if (or (< column 0) (> column 6))
-              (error "Ponga una columna del 0 al 6")
-              (if(< (get-remaining-pieces-player(get-player1 game)) 0)
-                 (error "El jugador 1 no tiene mas fichas")
-                 (if(< (get-remaining-pieces-player(get-player2 game)) 0)
-                    (error "El jugador 2 no tiene mas fichas")
-                    (if(equal? (game-is-draw? (updated-game game player column)) #t)
-                       (game-set-end (updated-game game player column))
-                       (if(equal? (get-id-player player) (get-id-player(game-get-current-player game)))
-                          (if (= (get-id-player player) 1)
-                              (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "red"))) 0)
-                                  (updated-game game player column)
-                                  (game-set-end (updated-game game player column)))
-                              (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "yellow"))) 0)
-                                  (updated-game game player column)
-                                  (game-set-end (updated-game game player column))))
-                          (error "No es tu turno"))))))))
+          (error "Ya hay un ganador, el juego ha finalizado") ; si con la board del juego actual se encuentra un ganado, se da este msj de error
+          (if (equal? (game-is-draw? game) #t)
+              (error "El juego ha terminado en empate")
+              (if (or (< column 0) (> column 6))
+                  (error "Ponga una columna del 0 al 6")
+                  (if(< (get-remaining-pieces-player(get-player1 game)) 0)
+                     (error "El jugador 1 no tiene mas fichas")
+                     (if(< (get-remaining-pieces-player(get-player2 game)) 0)
+                        (error "El jugador 2 no tiene mas fichas")
+                        (if(equal? (game-is-draw? (updated-game game player column)) #t) ;se evalua game-is-draw? con el game siguiente al game actual
+                           (game-set-end (updated-game game player column))
+                           (if(equal? (get-id-player player) (get-id-player(game-get-current-player game)))
+                              (if (= (get-id-player player) 1)
+                                  (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "red"))) 0) ;al igual que en game-is-draw? se evalua que en el siguiente game no haya un ganador
+                                      (updated-game game player column) ;se llama a una funcion auxiliar que quita una ficha a quien la haya jugado, le suma 1 al current-turn y se actualiza la board del game
+                                      (game-set-end (updated-game game player column))) ;si lo hay se llama a game-set-end para actualizar las estadisticas de los jugadores
+                                  (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "yellow"))) 0) ; se aplica lo mismo que en las tres lineas anteriores pero para la ficha yellow
+                                      (updated-game game player column)
+                                      (game-set-end (updated-game game player column))))
+                              (error "No es tu turno")))))))))
          
 
 
@@ -185,4 +194,29 @@
            #t
            (valid-position-in-the-rows? (my-cdr-board board))))) 
   (valid-position-in-the-rows? board))
+
+;Descripción: Función que agrega pares a una lista si encuentra una ficha
+;Dom: column (list) num-columns (int)
+;Rec: lista (list)
+;Tipo recursión: natural
+
+(define (move-column column num-columns)
+  (if (null? column)
+      '()
+      (if(equal? (get-firts-column column) 'R)
+         (cons (cons num-columns "red") (move-column (get-tail-column column) num-columns))
+         (if(equal? (get-firts-column column) 'Y)
+         (cons (cons num-columns "yellow") (move-column (get-tail-column column) num-columns))
+         (move-column (get-tail-column column) num-columns)))))
+
+;Descripción: Función que verifica todas las columnas de la board y le agrega un valor int a num-column en los pares que se crearon en move-column
+;Dom: board (board) num-column (int)
+;Rec: lista (list)
+;Tipo recursión: natural
+
+(define (moves-columns board num-column)
+  (if (= num-column 7)
+      '()
+       (append (move-column (get-column board num-column) num-column)
+              (moves-columns board (+ num-column 1)))))
   

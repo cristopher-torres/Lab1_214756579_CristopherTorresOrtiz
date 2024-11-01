@@ -34,7 +34,7 @@
 (define g12 (game-player-set-move g11 p2 3))  
 (define g13 (game-player-set-move g12 p1 4))  
 (define g14 (game-player-set-move g13 p2 0))  
-(define g15 (game-player-set-move g14 p1 0))  
+  
 
 ; 6. Verificaciones durante el juego
 (display "¿Se puede jugar despues de 7 movimientos? ")

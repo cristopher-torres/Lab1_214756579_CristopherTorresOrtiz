@@ -13,7 +13,7 @@
 ;Recorrido: board
 ;Tipo recursión: No aplica
 
-(define (board) (list(list 0 0 0 0 0 0 0)
+(define (board) (list(list 0 0 0 0 0 0 0)  ;los 0 representan que es una posicion vacia en la board
                      (list 0 0 0 0 0 0 0)
                      (list 0 0 0 0 0 0 0)
                      (list 0 0 0 0 0 0 0)
@@ -199,16 +199,17 @@
 ;Tipo recursión: de cola
 
 (define(board-check-diagonal-win board)
-  (define (check-diagonal row index)
+  (define (check-diagonal row index) ; se recorrera cada posicion de la board
     (if(= row 6)
        (get-not-winner winners)
        (if (= index 7)
            (check-diagonal (+ row 1) 0)
-           (if (or (= (get-victory-player (get-diagonal-asc board row index) 1) 1) (= (get-victory-player (get-diagonal-desc board row index ) 1) 1))
+           ;donde en cada posicion se verificara con una funcion auxiliar tanto la diagonal desc como la asc para verificar si hay un ganador
+           (if (or (= (get-victory-player (get-diagonal-asc board row index) 1) 1) (= (get-victory-player (get-diagonal-desc board row index ) 1) 1)) 
                (get-winner-1 winners)
                (if(or (= (get-victory-player (get-diagonal-asc board row index) 1) 2) (= (get-victory-player (get-diagonal-desc board row index) 1) 2) )
                   (get-winner-2 winners)
-                  (check-diagonal row (+ index 1)))))))
+                  (check-diagonal row (+ index 1))))))) ;index indica la posicion de la fila
   (check-diagonal 0 0))
 
 ;Descripcion: Funcion que verifica si hay un ganador, el cual puede ser vertical, horizontal o diagonal
@@ -241,13 +242,13 @@
           (if (equal? (get-color piece) "red")
               (if (null? (get-column board column))
                   (error "La columna esta llena")
-                  (if (valid-position? (reverse(get-column board column)))
+                  (if (valid-position? (get-column board column))
                       (new-board-R board column)
                       (error "La columna esta llena")))
               (if(equal? (get-color piece) "yellow")
                  (if (null? (get-column board column))
                      (error "La columna esta llena")
-                     (if (valid-position? (reverse(get-column board column)))
+                     (if (valid-position? (get-column board column))
                          (new-board-Y board column)
                          (error "La columna esta llena")))
                  (error "Solo puede usar los colores yellow o red")))
@@ -279,11 +280,11 @@
 ;Tipo recursión: de cola
 
 
-(define (put-piece row pos index piece)
+(define (put-piece row column index piece)
   (cond
     ((null? row) '())
-    ((= index pos) (cons piece (my-cdr-row row)))
-    (else (cons (my-car-row row) (put-piece (my-cdr-row row) pos (+ index 1) piece)))))
+    ((= index column) (cons piece (my-cdr-row row)))  ;si index(posicion en la fila) es igual a la columna se crea una nueva lista que pone la ficha en posicion indicada
+    (else (cons (my-car-row row) (put-piece (my-cdr-row row) column (+ index 1) piece))))) ;si no se encontro son iguales se llama recursivamente a la funcion con la cola de la fila agregando el primer elemento a la nueva lista y se aumenta el index en 1
 
 ;Descripción: Crea un nuevo tablero con una R en la columna que diga el usuario
 ;Dom: board (board), column (lista)
@@ -295,10 +296,12 @@
   (if(null? board)
      '()
      (if(null? (my-cdr-board board))
+        ;si estamos en la ultima fila coloca la ficha
         (cons (put-piece (my-car-board board) column 0 'R) (my-cdr-board board))
-      (if (and (not(equal? 'R (list-ref (my-car-board (my-cdr-board board)) column))) (not(equal? 'Y (list-ref (my-car-board (my-cdr-board board)) column))) (equal? 0 (list-ref (my-car-board (my-cdr-board board)) column)))
-        (cons (my-car-board board) (new-board-R (my-cdr-board board) column))
-        (cons (put-piece (my-car-board board) column 0 'R) (my-cdr-board board))))))
+       ;se verifica si la siguiente fila en la columna hay un 0
+      (if  (equal? 0 (list-ref (my-car-board (my-cdr-board board)) column))
+        (cons (my-car-board board) (new-board-R (my-cdr-board board) column)) ;si lo hay se sigue bajando de fila recursivamente
+        (cons (put-piece (my-car-board board) column 0 'R) (my-cdr-board board)))))) ; si no hay un 0 se coloca la ficha en la posicion actual
 
 ;Descripción: Crea un nuevo tablero con una Y en la columna que diga el usuario
 ;Dom: board (board), column (lista)
@@ -310,10 +313,12 @@
   (if(null? board)
      '()
      (if(null? (my-cdr-board board))
+        ;si estamos en la ultima fila coloca la ficha
         (cons (put-piece (my-car-board board) column 0 'Y) (my-cdr-board board))
-        (if(and (not(equal? (list-ref (my-car-board(my-cdr-board board)) column) 'Y)) (not(equal? (list-ref (my-car-board(my-cdr-board board)) column) 'R)) (equal? 0 (list-ref (my-car-board (my-cdr-board board)) column)))
-           (cons(my-car-board board) (new-board-Y (my-cdr-board board) column))
-           (cons (put-piece (my-car-board board) column 0 'Y) (my-cdr-board board))))))
+        ;se verifica si la siguiente fila en la columna hay un 0
+        (if (equal? 0 (list-ref (my-car-board (my-cdr-board board)) column))
+           (cons(my-car-board board) (new-board-Y (my-cdr-board board) column)) ;si lo hay se sigue bajando de fila recursivamente
+           (cons (put-piece (my-car-board board) column 0 'Y) (my-cdr-board board)))))) ; si no hay un 0 se coloca la ficha en la posicion actual
 
 
 ;Descripción: Obtiene una columna de la board
@@ -326,8 +331,8 @@
       '()
    (if (null? board)
        '()
-       (cons (list-ref (my-car-board board) column)
-            (get-column (my-cdr-board board) column)))))
+       (cons (list-ref (my-car-board board) column) ;se crea una nueva lista opteniendo el elemento que hay en la columna en la fila actual
+            (get-column (my-cdr-board board) column))))) ; se llama recursivamente a la funcion para seguir guardando los elementos en la nueva lista
 
 ;Descripción: funcion auxiliar que se usara en verificar la victoria vertical, la cual revisa si hay cuatro fichas seguidas iguales en una columna
 ;Dom: column(list)
@@ -371,8 +376,8 @@
 (define (get-diagonal-desc board row column)
   (if (or (>= row 6) (>= column 7)) 
       '()
-      (cons (list-ref (list-ref board row) column)
-            (get-diagonal-desc board (+ row 1) (+ column 1)))))
+      (cons (list-ref (list-ref board row) column) ;se crea una nueva lista y se optiene el elemento actual en la posicion fila columna
+            (get-diagonal-desc board (+ row 1) (+ column 1))))); se llama recursivamente a la funcion para seguir guardando los elementos de la diagonal en la nueva lista
 
 ;Descripción: Obtiene la columna ascendente de un elemento
 ;Dom: board (board), row (int), column (int)
@@ -383,8 +388,8 @@
 (define (get-diagonal-asc board row column)
   (if (or (< row 0) (>= column 7)) 
       '()
-      (cons (list-ref(list-ref board row) column)
-            (get-diagonal-asc board (- row 1) (+ column 1)))))
+      (cons (list-ref(list-ref board row) column) ;se crea una nueva lista y se optiene el elemento actual en la posicion fila columna
+            (get-diagonal-asc board (- row 1) (+ column 1))))) ; se llama recursivamente a la funcion para seguir creando la diagonal
 
 ;Descripción: funcion auxiliar que se usara en verificar la victoria diagonal, la cual revisa si hay cuatro fichas seguidas iguales en una diagonal
 ;Dom: diagonal (list), acc (int)
