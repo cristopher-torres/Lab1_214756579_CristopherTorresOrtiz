@@ -16,7 +16,7 @@
 
 (define (game player1 player2 board current-turn)
   (if (>= current-turn 1)
-      (list player1 player2 board current-turn)
+      (list player1 player2 board current-turn '()) ;se agrega una lista vacia para almacenar el game
       (error "El current-turn debe ser mayor que 0")))
 
 
@@ -84,6 +84,16 @@
       (get-player2 game)))
 
 
+;Descripcion: Obtiene la lista del historial
+;Dominio: game (game)
+;Recorrido: lista (list)
+;Tipo recursión: No aplica
+;Selector
+
+(define (get-history-game game)
+  (fifth game))
+
+
 ;----------------------------------------------------------------------------------------------------------------
 ;Bloque de otras funciones
 
@@ -91,9 +101,10 @@
 ;Dominio: game (game)
 ;Recorrido: history
 ;Tipo recursión: no aplica
+;declarartiva
 
 (define (game-history game)
-  (moves-columns (game-get-board game) 0))
+ (reverse(cons (my-car-game (get-history-game game)) (my-cdr-game(get-history-game game)))))
 
 ;Descripcion: Función que verifica si el estado actual del juego es empate.
 ;Dominio: game (game)
@@ -120,10 +131,10 @@
 
 (define(game-set-end game)
   (if (= (board-who-is-winner (game-get-board game)) 1)
-      (list(player-update-stats (get-player1 game) "win") (player-update-stats (get-player2 game) "loss")(game-get-board game) (get-current-turn-game game))
+      (list(player-update-stats (get-player1 game) "win") (player-update-stats (get-player2 game) "loss")(game-get-board game) (get-current-turn-game game)(get-history-game game) )
       (if(= (board-who-is-winner (game-get-board game)) 2)
-         (list(player-update-stats (get-player1 game) "loss") (player-update-stats (get-player2 game) "win")(game-get-board game) (get-current-turn-game game))
-         (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game)))))
+         (list(player-update-stats (get-player1 game) "loss") (player-update-stats (get-player2 game) "win")(game-get-board game) (get-current-turn-game game) (get-history-game game))
+         (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game) (get-history-game game)))))
 
 
 
@@ -150,7 +161,7 @@
                            (if(equal? (get-id-player player) (get-id-player(game-get-current-player game)))
                               (if (= (get-id-player player) 1)
                                   (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "red"))) 0) ;al igual que en game-is-draw? se evalua que en el siguiente game no haya un ganador
-                                      (updated-game game player column) ;se llama a una funcion auxiliar que quita una ficha a quien la haya jugado, le suma 1 al current-turn y se actualiza la board del game
+                                      (updated-game game player column) ;se llama a una funcion auxiliar que quita una ficha a quien la haya jugado, le suma 1 al current-turn, se actualiza la board del game y se actualiza el historial
                                       (game-set-end (updated-game game player column))) ;si lo hay se llama a game-set-end para actualizar las estadisticas de los jugadores
                                   (if (=(board-who-is-winner (board-set-play-piece (game-get-board game) column (piece "yellow"))) 0) ; se aplica lo mismo que en las tres lineas anteriores pero para la ficha yellow
                                       (updated-game game player column)
@@ -170,15 +181,15 @@
 (define (remove-piece player)
   (list (get-id-player player) (get-name-player player) (get-color-player player) (get-wins-player player)  (get-losses-player player) (get-draws-player player) (-(get-remaining-pieces-player player) 1)))
 
-;Descripcion: Función que permite actualizar las fichas del jugador, actualizar la board del game y sumar uno al current-turn
+;Descripcion: Función que permite actualizar las fichas del jugador, actualizar la board del game, actualizar el historial y sumar uno al current-turn
 ;Dominio: player (list) game (game) column (int)
 ;Recorrido: game (game)
 ;Tipo recursión: no aplica
 
 (define (updated-game game player column)
   (if(= (get-id-player player) 1)
-     (list  (remove-piece (get-player1 game)) (get-player2 game) (board-set-play-piece (game-get-board game) column (piece "red")) (+ (get-current-turn-game game) 1 ))
-     (list (get-player1 game) (remove-piece (get-player2 game)) (board-set-play-piece (game-get-board game) column (piece "yellow")) (+ (get-current-turn-game game) 1 ))))
+     (list  (remove-piece (get-player1 game)) (get-player2 game) (board-set-play-piece (game-get-board game) column (piece "red")) (+ (get-current-turn-game game) 1 )(put-mov-historial game column))
+     (list (get-player1 game) (remove-piece (get-player2 game)) (board-set-play-piece (game-get-board game) column (piece "yellow")) (+ (get-current-turn-game game) 1 ) (put-mov-historial game column))))
 
 ;Descripción: Función que permite verificar si se puede realizar más jugadas en el tablero.
 ;esta funcion es igual al board-can-play? sin verificar si hay un ganador, ya que me generaba un mal resultado en game-is-draw?.
@@ -195,28 +206,13 @@
            (valid-position-in-the-rows? (my-cdr-board board))))) 
   (valid-position-in-the-rows? board))
 
-;Descripción: Función que agrega pares a una lista si encuentra una ficha
-;Dom: column (list) num-columns (int)
+;Descripción: Función que agrega pares al historial al realizar un movimiento un jugador
+;Dom: column (list) red o yellow (string)
 ;Rec: lista (list)
 ;Tipo recursión: natural
 
-(define (move-column column num-columns)
-  (if (null? column)
-      '()
-      (if(equal? (get-firts-column column) 'R)
-         (cons (cons num-columns "red") (move-column (get-tail-column column) num-columns))
-         (if(equal? (get-firts-column column) 'Y)
-         (cons (cons num-columns "yellow") (move-column (get-tail-column column) num-columns))
-         (move-column (get-tail-column column) num-columns)))))
-
-;Descripción: Función que verifica todas las columnas de la board y le agrega un valor int a num-column en los pares que se crearon en move-column
-;Dom: board (board) num-column (int)
-;Rec: lista (list)
-;Tipo recursión: natural
-
-(define (moves-columns board num-column)
-  (if (= num-column 7)
-      '()
-       (append (move-column (get-column board num-column) num-column)
-              (moves-columns board (+ num-column 1)))))
+(define (put-mov-historial game column)
+  (if(equal?(game-get-current-player game) (get-player1 game))
+     (cons (cons column "red") (get-history-game game))
+     (cons (cons column "yellow") (get-history-game game))))
   
