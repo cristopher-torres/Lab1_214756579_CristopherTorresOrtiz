@@ -11,7 +11,9 @@
 (define (player id name color wins losses draws remaining-pieces)
   (if (and (integer? id) (integer? wins)(integer? losses)(integer? draws)(integer? remaining-pieces)(string? name)(string? color) ) ; Mediante un if verificamos que se ingresen bien los datos
       (if (and (< remaining-pieces 22) (> remaining-pieces 4)) ; verificar que el numero de fichas sea mayor que 4 y menor que 22
-          (list id name color wins losses draws remaining-pieces)
+          (if (or(and (equal? color "red") (= id 1)) (and (equal? color "yellow") (= id 2))) ; por medidas de implementacion el jugador 1 siempre sera red y el 2 yellow
+              (list id name color wins losses draws remaining-pieces)
+              (error "El jugador 1 debe tener el color red y el 2 el color yellow"))
           (error "Se ingreso un numero de fichas fuera del rango"))(error "Se ingreso un caracter invalido"))) 
  
 

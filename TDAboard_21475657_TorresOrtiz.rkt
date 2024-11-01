@@ -157,7 +157,7 @@
   (valid-position-in-the-rows? board))
 
 
-;Descripcion: Funcion que verifica si hay un ganador vertical, es decir, que hayan 4 fichas seguidas de un mismo color en una columna.
+;Descripcion: Funcion que verifica si hay un ganador vertical, es decir, que hayan 4 fichas seguidas de un mismo color en una columna. Donde la ficha R siempre sera para el jugador 1 y la ficha Y para el jugador 2
 ;Dominio: board (board) 
 ;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador vertical)
 ;Tipo recursión: natural
@@ -178,7 +178,7 @@
 
       
 
-;Descripcion: Funcion que verifica si hay un ganador horizontal, es decir, que hayan 4 fichas seguidas de un mismo color en una fila.
+;Descripcion: Funcion que verifica si hay un ganador horizontal, es decir, que hayan 4 fichas seguidas de un mismo color en una fila. Donde la ficha R siempre sera para el jugador 1 y la ficha Y para el jugador 2
 ;Dominio: board (board) 
 ;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador horizontal)
 ;Tipo recursión: natural
@@ -193,7 +193,7 @@
                    (get-winner-2 winners)
                    (board-check-horizontal-win (my-cdr-board board))))))
 
-;Descripcion: Funcion que verifica si hay un ganador diagonal, es decir, que hayan 4 fichas seguidas de un mismo color en una diagonal.
+;Descripcion: Funcion que verifica si hay un ganador diagonal, es decir, que hayan 4 fichas seguidas de un mismo color en una diagonal. Donde la ficha R siempre sera para el jugador 1 y la ficha Y para el jugador 2
 ;Dominio: board (board) 
 ;Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador diagonal)
 ;Tipo recursión: de cola
@@ -243,13 +243,13 @@
               (if (null? (get-column board column))
                   (error "La columna esta llena")
                   (if (valid-position? (get-column board column))
-                      (new-board-R board column)
+                      (new-board-R board column)  ; Se agregara una R en la columna indicada y en la posicion mas baja
                       (error "La columna esta llena")))
               (if(equal? (get-color piece) "yellow")
                  (if (null? (get-column board column))
                      (error "La columna esta llena")
                      (if (valid-position? (get-column board column))
-                         (new-board-Y board column)
+                         (new-board-Y board column) ; Se agregara una Y en la columna indicada y en la posicion mas baja
                          (error "La columna esta llena")))
                  (error "Solo puede usar los colores yellow o red")))
       (error "Se ingreso un numero fuera del rango"))
@@ -343,9 +343,9 @@
   (if (< (length column) 4)
       (get-not-winner winners)
       (if (and (equal? (get-firts-column column) (get-second-element column)) (equal? (get-second-element column) (get-three-element column)) (equal? (get-three-element column) (get-four-element column)))
-          (if (equal? (get-firts-column column) 'R)
+          (if (equal? (get-firts-column column) 'R) ;La ficha R siempre sera para el jugador 1 
               (get-winner-1 winners) 
-              (if (equal? (get-firts-column column) 'Y)
+              (if (equal? (get-firts-column column) 'Y) ;La ficha Y siempre para el jugador 2
                   (get-winner-2 winners)
                   (get-not-winner winners)))
           (win-column? (get-tail-column column)))))
@@ -360,9 +360,9 @@
   (if (< (length row) 4)  
       (get-not-winner winners)     
       (if (and (equal? (my-car-row row) (get-second-element row)) (equal? (get-second-element row) (get-three-element row)) (equal? (get-three-element row) (get-four-element row)))  
-          (if (equal? (my-car-row row) 'R)     
+          (if (equal? (my-car-row row) 'R)  ;La ficha R siempre sera para el jugador 1   
               (get-winner-1 winners)     
-              (if (equal? (my-car-row row) 'Y)  
+              (if (equal? (my-car-row row) 'Y) ;La ficha Y siempre para el jugador 2 
                   (get-winner-2 winners)
                   (get-not-winner winners)))
           (win-row? (my-cdr-row row)))))
@@ -400,9 +400,9 @@
   (if (null? (my-cdr-row diagonal))
       (get-not-winner winners) 
       (if (= acc 4)
-          (if (equal? (my-car-row diagonal) 'R)
+          (if (equal? (my-car-row diagonal) 'R) ;La ficha R siempre sera para el jugador 1
               (get-winner-1 winners) 
-              (if (equal? (my-car-row diagonal) 'Y)
+              (if (equal? (my-car-row diagonal) 'Y) ;La ficha Y siempre sera para el jugador 2
                   (get-winner-2 winners)
                   (get-not-winner winners)))
           (if (not(equal? (my-car-row diagonal) (my-car-row (my-cdr-row diagonal))))

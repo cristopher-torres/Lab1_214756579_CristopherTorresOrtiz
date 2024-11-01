@@ -6,21 +6,41 @@
 (require "TDAgame_21475657_TorresOrtiz.rkt")
 
 
-; 1. Creación de jugadores (21 fichas cada uno)
-(define p1 (player 1 "vegetta" "red" 0 0 0 21))
-(define p2 (player 2 "goku" "yellow" 0 0 0 21))
 
-; 2. Creación de piezas
+(define p1 (player 1 "vegetta" "morado" 0 0 0 21))
+(define p2 (player 2 "goku" "naranjo" 0 0 0 21))
+
+
 (define red-piece (piece "red"))
 (define yellow-piece (piece "yellow"))
 
-; 3. Creación del tablero inicial
+
+
 (define b0 (board))
 
-; 4. Creación de un nuevo juego
+(define empty-board (board))
+
+(define board1 (board))
+
+
+
+(define b1 (board-set-play-piece empty-board 1 red-piece))
+
+(define b2 (board-set-play-piece b1 4 yellow-piece))
+
+(define b3 (board-set-play-piece b2 1 yellow-piece))
+
+
+
+
 (define g0 (game p1 p2 b0 1))
 
-; 5. Realizando movimientos para victoria vertical
+(define new-game (game p1 p2 empty-board 1))
+
+(define game1 (game p1 p2 board1 1))
+
+
+
 (define g1 (game-player-set-move g0 p1 0))  
 (define g2 (game-player-set-move g1 p2 1))  
 (define g3 (game-player-set-move g2 p1 2))  
@@ -40,47 +60,114 @@
 (define g17 (game-player-set-move g16 p1 4))  
 (define g18 (game-player-set-move g17 p2 5))  
 (define g19 (game-player-set-move g18 p1 3))  
-(define g20 (game-player-set-move g19 p2 5)) ;victoria vertical jugador 2
+(define g20 (game-player-set-move g19 p2 5))
 
-; 6. Verificaciones durante el juego
+
 (display "¿Se puede jugar despues de 5 movimientos? ")
 (board-can-play? (game-get-board g5))
 
 (display "¿Se puede jugar después de 20 movimientos? ")
 (board-can-play? (game-get-board g20))
 
+(display "¿Se puede jugar despues de 10 movimientos? ")
+(board-can-play? (game-get-board g10))
+
+
+
+(display "Jugador actual después de 7 movimientos: ")
+(game-get-current-player g7)
+
+(display "Jugador actual después de 10 movimientos: ")
+(game-get-current-player g10)
+
 (display "Jugador actual después de 19 movimientos: ")
 (game-get-current-player g19)
 
-; 7. Verificación de victoria
-(display "Verificación de victoria vertical: ")
+
+
+(display "Verificación de victoria vertical despues de 11 movimientos: ")
+(board-check-vertical-win (game-get-board g11))
+
+(display "Verificación de victoria vertical despues de 5 movimientos: ")
+(board-check-vertical-win (game-get-board g5))
+
+(display "Verificación de victoria vertical despues de 20 movimientos: ")
 (board-check-vertical-win (game-get-board g20))
 
-(display "Verificación de victoria horizontal: ")
+
+
+(display "Verificación de victoria horizontal despues de 15 movimientos: ")
+(board-check-horizontal-win (game-get-board g15))
+
+(display "Verificación de victoria horizontal despues de 10 movimientos: ")
+(board-check-horizontal-win (game-get-board g10))
+
+(display "Verificación de victoria horizontal despues de 20 movimientos: ")
 (board-check-horizontal-win (game-get-board g20))
 
-(display "Verificación de victoria diagonal: ")
+
+
+(display "Verificación de victoria diagonal depues de 16 movimientos: ")
+(board-check-diagonal-win (game-get-board g16))
+
+(display "Verificación de victoria diagonal depues de 7 movimientos: ")
+(board-check-diagonal-win (game-get-board g7))
+
+(display "Verificación de victoria diagonal depues de 20 movimientos: ")
 (board-check-diagonal-win (game-get-board g20))
 
-(display "Verificación de ganador: ")
+
+(display "Verificación de ganador despues de 9 movimientos: ")
+(board-who-is-winner (game-get-board g9))
+
+(display "Verificación de ganador despues de 12 movimientos: ")
+(board-who-is-winner (game-get-board g12))
+
+(display "Verificación de ganador despues de 20 movimientos: ")
 (board-who-is-winner (game-get-board g20))
 
-; 8. Verificación de empate
-(display "¿Es empate? ")
+
+
+(display "¿Es empate? despues de 10 movimientos: ")
+(game-is-draw? g10)
+
+(display "¿Es empate? despues de 15 movimientos: ")
+(game-is-draw? g15)
+
+(display "¿Es empate? despues de 20 movimientos: ")
 (game-is-draw? g20)
 
-; 9. Finalizar el juego y actualizar estadísticas
-(define ended-game (game-set-end g20)) ;dara 2 victorias para goku y 2 derrotas para vegetta, ya que al finalizar la partida en game-player-set-move tambien se actualizan las estadisticas
 
-; 11. Mostrar historial de movimientos
-(display "Historial de movimientos: ")
+
+(define ended1? (game-set-end g11)) 
+
+(define ended2? (game-set-end g15)) 
+
+(define ended-game (game-set-end g20)) 
+
+
+
+(display "Historial de movimientos despues de 5 movimientos: ")
+(game-history g5)
+
+(display "Historial de movimientos despues de 8 movimientos: ")
+(game-history g8)
+
+(display "Historial de movimientos de la partida finalizada: ")
 (game-history ended-game)
 
-; 12. Mostrar estado final del tablero
+
+
+(displayln "Estado del tablero despues de 3 movimientos: ")
+(game-get-board g3)
+
+(displayln "Estado del tablero despues de 10 movimientos: ")
+(game-get-board g10)
+
 (displayln "Estado final del tablero: ")
 (game-get-board ended-game)
 
-; 13. Actualizar estadísticas de los jugadores
+
 (define updated-p1 (player-update-stats p1 "loss"))
 (define updated-p2 (player-update-stats p2 "win"))
   

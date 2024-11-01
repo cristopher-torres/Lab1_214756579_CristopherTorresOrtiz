@@ -134,7 +134,9 @@
       (list(player-update-stats (get-player1 game) "win") (player-update-stats (get-player2 game) "loss")(game-get-board game) (get-current-turn-game game)(get-history-game game) )
       (if(= (board-who-is-winner (game-get-board game)) 2)
          (list(player-update-stats (get-player1 game) "loss") (player-update-stats (get-player2 game) "win")(game-get-board game) (get-current-turn-game game) (get-history-game game))
-         (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game) (get-history-game game)))))
+         (if (game-is-draw? game)
+             (list(player-update-stats (get-player1 game) "draw") (player-update-stats (get-player2 game) "draw")(game-get-board game) (get-current-turn-game game) (get-history-game game))
+             (list (get-player1 game)   (get-player2 game) (game-get-board game) (get-current-turn-game game) (get-history-game game))))))
 
 
 
