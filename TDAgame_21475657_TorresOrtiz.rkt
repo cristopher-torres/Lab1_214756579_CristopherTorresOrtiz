@@ -16,7 +16,7 @@
 
 (define (game player1 player2 board current-turn)
   (if (>= current-turn 1)
-      (list player1 player2 board current-turn '()) ;se agrega una lista vacia para almacenar el game
+      (list player1 player2 board current-turn '()) ;se agrega una lista vacia para almacenar el historial
       (error "El current-turn debe ser mayor que 0")))
 
 
